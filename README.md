@@ -2,6 +2,20 @@
 
 "AI Copywriter for Google Shopping" is a Google Apps Script that automates product title and description generation using OpenAI. The script reads from a Google Sheets product feed, processes each product link with OpenAI, and writes back the results. It features customizable OpenAI prompts, scheduled runs, and smart timeout handling.
 
+## OpenAI
+
+1. Visit the [OpenAI]([https://link-url-here.org](https://openai.com/blog/openai-api) website.
+2. Sign up for an account if you don't already have one.
+3. Navigate to the API section in your account settings.
+4. Create a new API key and save it safely.
+
+## Apify
+
+1. Go to the [Apify]([[https://link-url-here.org](https://openai.com/blog/openai-api](https://console.apify.com/sign-up) website.
+2. Sign up for a new account if needed.
+3. In your account settings, navigate to the API section.
+4. Copy your new API key and save it for later use.
+
 ## Setting Up Google Merchant Center Product Feed
 
 Before you start, you will need to create a product feed in Google Merchant Center. Here are the steps to do this:
