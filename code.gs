@@ -13,6 +13,8 @@ var brandName = "Your Brand Name";
 var brandUrl = "https://www.your-brand-url.com";
 
 function BatchProcessTest() {
+  PropertiesService.getScriptProperties().deleteProperty('processedUrls');
+
   // funcName must equal the function name we're using for batch processing, in this case, 'generateText'.
   const funcName = 'generateText';
   
@@ -60,28 +62,27 @@ function BatchProcessTest() {
 // This is the main function that initiates the script
 function main() {
   const funcName = 'generateText';
-  // Get the starting index for processing
   let startIndex = PropertiesService.getScriptProperties().getProperty(funcName);
   startIndex = startIndex ? parseInt(startIndex) : 0;
 
+  // Delete 'processedUrls' property and initialize 'processedUrls' as an empty object
+  PropertiesService.getScriptProperties().deleteProperty('processedUrls');
+  processedUrls = {};
+
   if (startIndex === 0) {
-    console.log('--- Command started. ---');
+    Logger.log('--- Command started. ---');
   }
 
-  // Loop for processing text generation
   for (let i = startIndex; i < 1; i++) {
-    console.log('Processing: ' + i);
+    Logger.log('Processing: ' + i);
     generateText();
-    console.log('Processing Done!: ' + i);
-    // Update the script properties with the new index
+    Logger.log('Processing Done!: ' + i);
     PropertiesService.getScriptProperties().setProperty(funcName, i + 1);
   }
 
-  // Check if the processing is finished
   const finished = PropertiesService.getScriptProperties().getProperty(funcName) == '1';
   if (finished) {
-    console.log('--- Command finished. ---');
-    // Delete the property if processing is finished
+    Logger.log('--- Command finished. ---');
     PropertiesService.getScriptProperties().deleteProperty(funcName);
   }
 }
@@ -120,8 +121,15 @@ function generateText() {
       var titleCell = sheet.getRange(i + 1, 2);
       var descriptionCell = sheet.getRange(i + 1, 3);
 
-      // If the URL is present and the title and description cells are blank, generate the text
-      if (url && titleCell.isBlank() && descriptionCell.isBlank()) {
+      // Check if cells are still blank after attempting to scrape and generate text
+      if (titleCell.isBlank() && descriptionCell.isBlank()) {
+        
+        // Delete URL from processedUrls object
+        delete processedUrls[url];
+
+        // Update the 'processedUrls' property in the script properties with the updated processedUrls object.
+        PropertiesService.getScriptProperties().setProperty('processedUrls', JSON.stringify(processedUrls));
+
         // Set instructions for the text generation
         var instructionTitle = "Generate a Google Shopping product title within 1-150 characters, in the format: [Product Name] - [Item Category] - [Item Sub-Category] - [Item Sub-Sub-Category] | " + brand + ". Use professional language and correct grammar. Avoid all caps, quotes, lists, symbols, HTML tags, promotional text, foreign words not widely understood, foreign characters for attention-grabbing, capital letters for emphasis, promotional details such as price or sale information, and extra white spaces. Capitalization is acceptable for abbreviations, phone numbers, countries, and currency. Aim for an SEO-optimized and semantically accurate title.";
 
@@ -206,7 +214,7 @@ function scrapeWithCURL(url, attribute, instruction) {
   var response = UrlFetchApp.fetch(apiUrl, options);
   var runJson = JSON.parse(response.getContentText());
 
-  console.log("Response from initial fetch: " + JSON.stringify(runJson));
+  Logger.log("Response from initial fetch: " + JSON.stringify(runJson));
 
   var runId = runJson.data.id;
   var taskUrl = 'https://api.apify.com/v2/actor-runs/' + runId + '?token=' + apifyConfig.apiKey;
@@ -217,14 +225,14 @@ function scrapeWithCURL(url, attribute, instruction) {
     var runResponse = UrlFetchApp.fetch(taskUrl);
     runJson = JSON.parse(runResponse.getContentText());
 
-    console.log("Response from checking run status: " + JSON.stringify(runJson));
+    Logger.log("Response from checking run status: " + JSON.stringify(runJson));
 
     if (runJson.data.status == 'SUCCEEDED') {
       var datasetUrl = 'https://api.apify.com/v2/datasets/' + runJson.data.defaultDatasetId + '/items?token=' + apifyConfig.apiKey;
       var dataResponse = UrlFetchApp.fetch(datasetUrl);
       var dataJson = JSON.parse(dataResponse.getContentText());
 
-      console.log("Response from fetching dataset: " + JSON.stringify(dataJson));
+      Logger.log("Response from fetching dataset: " + JSON.stringify(dataJson));
 
       if (dataJson && dataJson.length > 0) {
         return {
