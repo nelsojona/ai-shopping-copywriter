@@ -1,4 +1,4 @@
-// v1.0 Google Sheets Copywriter for Google Shopping Feed by Jonathan Nelson
+// v1.0 AI Copywriter for Google Shopping Feed by Jonathan Nelson
 // Requirements: Apify API key, OpenAI API key
 
 // Configuration area for APIs - replace with your own keys
