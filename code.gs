@@ -98,7 +98,7 @@ function sanitizeOutput(output) {
 // Function to generate text based on the data in Google Sheet
 function generateText() {
   // Open the Google Sheet and get the data
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1'); 
+  var sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Sheet1'); 
   var data = sheet.getDataRange().getValues(); 
 
   // Loop through each row of the sheet
