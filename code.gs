@@ -1,4 +1,4 @@
-// v1.0 AI Copywriter for Google Shopping Feed by Jonathan Nelson
+// v1.1 AI Copywriter for Google Shopping Feed by Jonathan Nelson
 // Requirements: Apify API key, OpenAI API key
 
 // Configuration area for APIs - replace with your own keys
@@ -90,76 +90,16 @@ function main() {
 // Create an object to store processed URLs. If it does not exist yet, initialize as an empty object.
 let processedUrls = JSON.parse(PropertiesService.getScriptProperties().getProperty('processedUrls')) || {};
 
+// Create a dictionary to hold ID and corresponding title and description
+let idTitleDescriptionMap = {};
+
 // Function to sanitize output
 function sanitizeOutput(output) {
   return output.replace(/['"]+/g, ''); // This will remove all single and double quotes from the output
 }
 
-// Function to generate text based on the data in Google Sheet
-function generateText() {
-  // Open the Google Sheet and get the data
-  var sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Sheet1'); 
-  var data = sheet.getDataRange().getValues(); 
-
-  // Loop through each row of the sheet
-  for (var i = 1; i < data.length; i++) {
-    // Get the URL and brand from the row
-    var url = data[i][3].trim();
-    var brand = data[i][8];
-
-    // We are now checking if the URL has been processed already. 
-    // If it has not, then we continue processing it. If it has been processed already, then we skip to the next iteration of the loop.
-    if (!processedUrls[url]) {
-      // Mark the URL as processed. This will prevent the script from processing the same URL again in the future.
-      processedUrls[url] = true;
-      
-      // Update the 'processedUrls' property in the script properties. 
-      // We are converting the 'processedUrls' object to a string since the script properties can only store strings.
-      PropertiesService.getScriptProperties().setProperty('processedUrls', JSON.stringify(processedUrls));
-
-      // Get the cell for title and description
-      var titleCell = sheet.getRange(i + 1, 2);
-      var descriptionCell = sheet.getRange(i + 1, 3);
-
-      // Check if cells are still blank after attempting to scrape and generate text
-      if (titleCell.isBlank() && descriptionCell.isBlank()) {
-        
-        // Delete URL from processedUrls object
-        delete processedUrls[url];
-
-        // Update the 'processedUrls' property in the script properties with the updated processedUrls object.
-        PropertiesService.getScriptProperties().setProperty('processedUrls', JSON.stringify(processedUrls));
-
-        // Set instructions for the text generation
-        var instructionTitle = "Generate a Google Shopping product title within 1-150 characters, in the format: [Product Name] - [Item Category] - [Item Sub-Category] - [Item Sub-Sub-Category] | " + brand + ". Use professional language and correct grammar. Avoid all caps, quotes, lists, symbols, HTML tags, promotional text, foreign words not widely understood, foreign characters for attention-grabbing, capital letters for emphasis, promotional details such as price or sale information, and extra white spaces. Capitalization is acceptable for abbreviations, phone numbers, countries, and currency. Aim for an SEO-optimized and semantically accurate title.";
-
-        var instructionDescription = "Generate a 1-500 character SEO-friendly description for each product under the specified brand " + brand + " for Google Shopping. Highlight key product features without discussing compatibility or comparisons. Use professional, grammatically correct language and appropriate keywords for SEO. Avoid using all caps, quotes, lists, symbols, promotional text, foreign languages or characters not relevant to the product. Symbols, when necessary in XML or JSON, should use XML entities or escape characters. Don't refer to categorization systems or include links other than the product landing page via the link attribute. Avoid promotional information; each product should have its unique description for optimal SEO and Google Shopping performance.";
-        
-        // Scrape the title and description from the website
-        var scrapedTitle = scrapeWithCURL(url, "title", instructionTitle);
-        var scrapedDescription = scrapeWithCURL(url, "description", instructionDescription);
-        
-        // Sanitize the scraped title and description
-        if (scrapedTitle && scrapedTitle.title) {
-          var sanitizedTitle = sanitizeOutput(scrapedTitle.title);
-          titleCell.setValue(sanitizedTitle);
-        }
-        if (scrapedDescription && scrapedDescription.description) {
-          var sanitizedDescription = sanitizeOutput(scrapedDescription.description);
-          descriptionCell.setValue(sanitizedDescription);
-        }
-      }
-    }
-  }
-}
-
 // Function to scrape website data using CURL
-// @param {string} url - URL of the page to scrape
-// @param {string} attribute - Attribute to scrape (e.g., "title" or "description")
-// @param {string} instruction - Instruction for the scraper
-// @return {object|null} - Object containing the scraped data, or null if an error occurred or no data was found
 function scrapeWithCURL(url, attribute, instruction) {
-  // Regular expression to check if the URL is valid
   var regex = new RegExp('^(https?:\\/\\/)?'+ // protocol
     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
     '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
@@ -245,6 +185,50 @@ function scrapeWithCURL(url, attribute, instruction) {
     }
     else if (runJson.data.status == 'FAILED') {
       return null;
+    }
+  }
+}
+
+// Function to generate text based on the data in Google Sheet
+function generateText() {
+  var sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Sheet1'); 
+  var data = sheet.getDataRange().getValues(); 
+
+  for (var i = 1; i < data.length; i++) {
+    var currentId = data[i][0]; // Assuming column A is the first column and contains the ID
+    var url = data[i][4].trim();
+    var brand = data[i][9];
+
+    if(idTitleDescriptionMap[currentId]){
+      // Use existing title and description
+      var titleCell = sheet.getRange(i + 1, 3);
+      var descriptionCell = sheet.getRange(i + 1, 4);
+      titleCell.setValue(idTitleDescriptionMap[currentId].title);
+      descriptionCell.setValue(idTitleDescriptionMap[currentId].description);
+    } else if (!processedUrls[url]) {
+      var titleCell = sheet.getRange(i + 1, 3);
+      var descriptionCell = sheet.getRange(i + 1, 4);
+
+      if (titleCell.isBlank() && descriptionCell.isBlank()) {
+        var instructionTitle = "Generate a Google Shopping product title...";
+        var instructionDescription = "Generate a 1-500 character SEO-friendly description...";
+
+        var scrapedTitle = scrapeWithCURL(url, "title", instructionTitle);
+        var scrapedDescription = scrapeWithCURL(url, "description", instructionDescription);
+        
+        if (scrapedTitle && scrapedTitle.title && scrapedDescription && scrapedDescription.description) {
+          var sanitizedTitle = sanitizeOutput(scrapedTitle.title);
+          var sanitizedDescription = sanitizeOutput(scrapedDescription.description);
+          titleCell.setValue(sanitizedTitle);
+          descriptionCell.setValue(sanitizedDescription);
+
+          // Add to ID map
+          idTitleDescriptionMap[currentId] = {
+            title: sanitizedTitle,
+            description: sanitizedDescription
+          };
+        }
+      }
     }
   }
 }
