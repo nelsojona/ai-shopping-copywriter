@@ -1,15 +1,29 @@
 # AI Shopping Copywriter
 
-"AI Copywriter for Google Shopping" is a Google Apps Script that automates product title and description generation using OpenAI. The script reads from a Google Sheets product feed, processes each product link with OpenAI, and writes back the results. It features customizable OpenAI prompts, scheduled runs, and smart timeout handling.
+"AI Copywriter for Google Shopping" is a Google Apps Script that automates product title and description generation using OpenAI. The script reads from a Google Sheets product feed, processes each product link with OpenAI, and writes back the results. It features customizable OpenAI prompts, scheduled runs, and smart timeout handling. This script now includes additional support for Shopify using the InstaSheets app.
 
-## OpenAI
+## For Shopify Users
+
+### Requirements:
+
+1. **Install InstaSheets**: Add the [InstaSheets app](https://apps.shopify.com/google-sheets-1) to your Shopify store to link your products with a Google Sheet.
+2. **Google Sheet Template**: Copy the provided [Google Sheet template](https://docs.google.com/spreadsheets/d/1B3GQZbgD14ik_ZWO51M_ooAt0BwKShlHNYMrVLx2S4E/edit#gid=0). This will serve as the starting point for your product feed.
+3. **Field Mapping**: In InstaSheets, map any additional fields you require to the corresponding columns in the Google Sheet Template.
+
+### Setup:
+
+Once InstaSheets is installed and your Google Sheet template is ready, ensure that the product data in Shopify corresponds correctly to the fields in the Google Sheet. This might include product titles, descriptions, URLs, and any other information the AI Copywriter will use.
+
+## General Requirements
+
+### OpenAI
 
 1. Visit the [OpenAI](https://openai.com/blog/openai-api) website.
 2. Sign up for an account if you don't already have one.
 3. Navigate to the API section in your account settings.
 4. Create a new API key and save it safely.
 
-## Apify
+### Apify
 
 1. Go to the [Apify](https://console.apify.com/sign-up) website.
 2. Sign up for a new account if needed.
@@ -70,4 +84,4 @@ Now that you have your product feed, you can set up the script. Follow the steps
 
 - The variables `instructionTitle` and `instructionDescription` can be updated to your liking. If you find a prompt that improves your results, we encourage you to share it.
 
-Your feedback is important to us. If you have any suggestions for improvements, or encounter any issues, please let us know. Your input helps us make this tool better for everyone.
+Your feedback is important to me. If you have any suggestions for improvements, or encounter any issues, please post an issue. Your input helps me us make this tool better for everyone.
