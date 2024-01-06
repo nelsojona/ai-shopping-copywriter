@@ -210,8 +210,8 @@ function generateText() {
       var descriptionCell = sheet.getRange(i + 1, 4);
 
       if (titleCell.isBlank() && descriptionCell.isBlank()) {
-        var instructionTitle = "Generate a Google Shopping product title...";
-        var instructionDescription = "Generate a 1-500 character SEO-friendly description...";
+        var instructionTitle = "Generate a Google Shopping product title within 1-150 characters, in the format: [Product Name] - [Item Category] - [Item Sub-Category] - [Item Sub-Sub-Category] | " + brand + ". Use professional language and correct grammar. Avoid all caps, quotes, lists, symbols, HTML tags, promotional text, foreign words not widely understood, foreign characters for attention-grabbing, capital letters for emphasis, promotional details such as price or sale information, and extra white spaces. Capitalization is acceptable for abbreviations, phone numbers, countries, and currency. Aim for an SEO-optimized and semantically accurate title.";
+        var instructionDescription = "Generate a 1-500 character SEO-friendly description for each product under the specified brand " + brand + " for Google Shopping. Highlight key product features without discussing compatibility or comparisons. Use professional, grammatically correct language and appropriate keywords for SEO. Avoid using all caps, quotes, lists, symbols, promotional text, foreign languages or characters not relevant to the product. Symbols, when necessary in XML or JSON, should use XML entities or escape characters. Don't refer to categorization systems or include links other than the product landing page via the link attribute. Avoid promotional information; each product should have its unique description for optimal SEO and Google Shopping performance.";
 
         var scrapedTitle = scrapeWithCURL(url, "title", instructionTitle);
         var scrapedDescription = scrapeWithCURL(url, "description", instructionDescription);
