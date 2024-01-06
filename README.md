@@ -66,6 +66,38 @@ Now that you have your product feed, you can set up the script. Follow the steps
   - Select the function to run, the deployment, the event source (time-driven), and the type and time of timing (for example, every 5 minutes).
 - Note: The script will timeout after 6 minutes. If your feed is lengthy, it may take several cycles to finish.
 
+## Trigger for Automated Scheduling
+
+Automate the running of your "AI Copywriter for Google Shopping" script with Google Apps Script Trigger to ensure your product feed is always up to date.
+
+### How to Set Up Trigger:
+
+1. In the Google Sheets menu, click on 'Extensions' > 'Apps Script'.
+2. Navigate to 'Edit' > 'Current project's triggers' in the Apps Script editor.
+3. Click on the '+ Add Trigger' button at the bottom-left corner of the page.
+4. Make the following selections for your trigger:
+   - Choose which function to run: `BatchProcessTest`
+   - Choose which deployment should run: `Head`
+   - Select event source: `Time-driven`
+   - Then, choose the type of time-based trigger you want (e.g., Hour timer, Day timer, etc.) and set the frequency.
+
+### Failure Notification Settings:
+
+1. To stay informed about any issues with the scheduled script, configure failure notifications:
+   - Click on the 'Failure notification settings' (usually represented by a bell icon).
+   - Choose your preferred notification frequency, such as 'Notify me daily'.
+   
+By setting up these triggers, your script will run automatically, processing your Shopify-based Google Shopping Feed at regular intervals without any manual intervention. This ensures that any changes or additions to your product catalog are reflected promptly in your feed.
+
+### Important Notes:
+
+- The script execution has a timeout limit set by Google Apps Script, which is currently 6 minutes. If your feed processing exceeds this limit, consider splitting your feed or running the script more frequently in smaller batches to ensure all products are updated.
+- Regularly review your script's execution logs to monitor for any errors or timeouts and adjust your scheduling or script logic as necessary.
+
+## Feedback and Contributions
+
+We're constantly looking to improve the functionality and user experience of the AI Shopping Copywriter. Your feedback is crucial, so if you have any suggestions for improvements, face any issues, or have found a custom prompt that works wonders, don't hesitate to reach out or post an issue in the repository. Together, we can make this tool even better for the community.
+
 ## Script Properties and Memory Management
 
 - The script stores results in memory using PropertiesService. To reset this:
